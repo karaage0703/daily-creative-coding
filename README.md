@@ -5,6 +5,4 @@ Daily Creative Coding
 
 # Deliverables
 - [20211126_001_first](./20211126_001_first)
-
-# References
-- https://yoppa.org/sfc-design21/10515.html
+- [20211127_001_classification_on_camera](./20211127_001_classification_on_camera)
