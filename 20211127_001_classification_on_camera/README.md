@@ -1,6 +1,5 @@
-# daily-creative-coding
-Daily Creative Coding
-
+# 20211127_001_classification_on_camera
+Image classification on camera using by machine learning
 
 # References
 - https://github.com/ml5js/ml5-library
