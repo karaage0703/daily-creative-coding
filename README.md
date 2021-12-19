@@ -16,4 +16,3 @@ Daily Creative Coding
 
 # References
 - https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6
-- 
