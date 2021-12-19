@@ -12,3 +12,4 @@ Daily Creative Coding
 - [20211204_001_device_acceleration(Not working)](./20211204_001_device_acceleration)
 - [20211205_001_tweakpane_test](./20211205_001_tweakpane_test)
 - [20211219_001_sin](./20211219_001_sin)
+- [20211219_002_sin](./20211219_002_sin)
