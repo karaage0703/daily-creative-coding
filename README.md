@@ -14,6 +14,7 @@ Daily Creative Coding
 - [20211219_001_sin](./20211219_001_sin)
 - [20211219_002_sin](./20211219_002_sin)
 - [20211219_003_web_midi](./20211219_003_web_midi)
+- [20211224_001_hand_pose](./20211224_001_hand_pose)
 
 # References
 - https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6
