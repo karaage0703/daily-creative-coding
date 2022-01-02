@@ -15,6 +15,7 @@ Daily Creative Coding
 - [20211219_002_sin](./20211219_002_sin)
 - [20211219_003_web_midi](./20211219_003_web_midi)
 - [20211224_001_hand_pose](./20211224_001_hand_pose)
+- [20220102_001_tiger_mask](./20220102_001_tiger_mask)
 
 # References
 - https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6
