@@ -5,6 +5,9 @@ Daily Creative Coding
 
 [GitHub Repository](https://github.com/karaage0703/daily-creative-coding)
 
+# Pinned
+- [20220102_001_tiger_mask](./20220102_001_tiger_mask)
+
 # Deliverables
 - [20211126_001_first](./20211126_001_first)
 - [20211127_001_classification_on_camera](./20211127_001_classification_on_camera)
@@ -18,6 +21,7 @@ Daily Creative Coding
 - [20220102_001_tiger_mask](./20220102_001_tiger_mask)
 - [20220104_001_hand_pose_full](./20220104_001_hand_pose_full)
 - [20220104_002_virtual_theremin](./20220104_002_virtual_theremin)
+- [20220105_001_multi_sound](./20220105_001_multi_sound)
 
 # References
 - https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6
