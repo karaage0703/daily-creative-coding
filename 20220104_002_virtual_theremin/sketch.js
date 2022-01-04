@@ -20,6 +20,16 @@ handpose.load().then(function (_model) {
   handposeModel = _model;
 });
 
+
+function mousePressed() {
+    osc.start();
+}
+
+
+function mouseReleased() {
+    osc.stop();
+}
+
 function setup() {
   camera = createCapture(VIDEO);
 
@@ -30,16 +40,21 @@ function setup() {
 
   camera.hide();
 
-  // osc = new p5.Oscillator('sine');
-  // osc.start();
+  osc = new p5.Oscillator('sine');
 }
+
 
 function drawHands(hands) {
   for (var i = 0; i < hands.length; i++) {
     var landmarks = hands[i].landmarks;
 
+		theremin_x = 0;
+		theremin_y = 0;
+
     for (var j = 0; j < landmarks.length; j++) {
       var [x, y, z] = landmarks[j];
+      theremin_x += x;
+      theremin_y += y;
 
       fill(255, 255, 255);
       circle(
@@ -49,23 +64,17 @@ function drawHands(hands) {
       );
     }
 
-    theremin_x = 0;
-    theremin_y = 0;
-    for (var j = 0; j < landmarks.length; j++) {
-      var [x, y, z] = landmarks[j];
-      // theremin_x += x;
-      theremin_x += x;
-      theremin_y += y;
-    }
-    theremin_x = theremin_x / landmarks.length;
-    theremin_y = theremin_y / landmarks.length;
+		theremin_x = theremin_x / landmarks.length;
+    theremin_y = theremin_y / landmarks.length;		
   }
 
-  osc.amp(theremin_x/windowWidth);
-  osc.freq(int(theremin_y/windowHeight * 100) + 440);
-  // fill(mouseY, 0, 0);
+	osc.amp(int(theremin_y / windowHeight) * 10);
+  osc.freq(int(theremin_x / windowWidth * 100) + 440);
+
+	// fill(mouseY, 0, 0);
   // circle(mouseX, windowHeight / 2, mouseX / 2);
 }
+
 
 function draw() {
   if (handposeModel && videoDataLoaded) {
@@ -86,7 +95,7 @@ function draw() {
   image(img, 0, 0, width, height);
   scale_width = width / camera.width;
   scale_height = height / camera.height;
-  // drawHands(myHands);
+  drawHands(myHands);
 
   fill(127, 127, 127);
   textSize(15);
