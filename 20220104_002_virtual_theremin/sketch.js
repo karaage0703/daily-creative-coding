@@ -48,8 +48,8 @@ function drawHands(hands) {
   for (var i = 0; i < hands.length; i++) {
     var landmarks = hands[i].landmarks;
 
-		theremin_x = 0;
-		theremin_y = 0;
+    theremin_x = 0;
+    theremin_y = 0;
 
     for (var j = 0; j < landmarks.length; j++) {
       var [x, y, z] = landmarks[j];
@@ -64,14 +64,14 @@ function drawHands(hands) {
       );
     }
 
-		theremin_x = theremin_x / landmarks.length;
-    theremin_y = theremin_y / landmarks.length;		
+    theremin_x = theremin_x / landmarks.length;
+    theremin_y = theremin_y / landmarks.length;
   }
 
-	osc.amp(int(theremin_y / windowHeight) * 10);
-  osc.freq(int(theremin_x / windowWidth * 100) + 440);
+  // osc.amp(theremin_y / windowHeight * 10);
+  osc.freq(int((theremin_x * scale_width / windowWidth) * 100) + 440);
 
-	// fill(mouseY, 0, 0);
+  // fill(mouseY, 0, 0);
   // circle(mouseX, windowHeight / 2, mouseX / 2);
 }
 
