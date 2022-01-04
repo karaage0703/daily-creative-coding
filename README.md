@@ -22,6 +22,7 @@ Daily Creative Coding
 - [20220104_001_hand_pose_full](./20220104_001_hand_pose_full)
 - [20220104_002_virtual_theremin](./20220104_002_virtual_theremin)
 - [20220105_001_multi_sound](./20220105_001_multi_sound)
+- [20220105_002_pose_net_sample](./20220105_002_pose_net_sample)
 
 # References
 - https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6
