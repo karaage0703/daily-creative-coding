@@ -14,6 +14,7 @@ let theremin_x;
 let theremin_y;
 
 let osc;
+let osc_flag = false;
 
 handpose.load().then(function (_model) {
   statusText = "Model loaded.";
@@ -27,7 +28,7 @@ function mousePressed() {
 
 
 function mouseReleased() {
-    osc.stop();
+//    osc.stop();
 }
 
 function setup() {
@@ -60,7 +61,7 @@ function drawHands(hands) {
       circle(
         x * scale_width,
         y * scale_height,
-        (10 * (scale_width + scale_height)) / 2
+        (20 * (scale_width + scale_height)) / 2
       );
     }
 
@@ -81,7 +82,7 @@ function draw() {
     handposeModel.estimateHands(camera.elt).then(function (_hands) {
       myHands = _hands;
       if (!myHands.length) {
-        statusText = "Show some hands!";
+        statusText = "Show some hands and click(tap) screen!";
       } else {
         statusText =
           "Confidence: " +
@@ -97,7 +98,7 @@ function draw() {
   scale_height = height / camera.height;
   drawHands(myHands);
 
-  fill(127, 127, 127);
-  textSize(15);
+  fill(0, 0, 0);
+  textSize(25);
   text(statusText, 20, 20);
 }
