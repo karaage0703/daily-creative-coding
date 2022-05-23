@@ -6,6 +6,7 @@ Daily Creative Coding
 [GitHub Repository](https://github.com/karaage0703/daily-creative-coding)
 
 # Pinned
+- [20220523_003_skeleton_sequencer](./20220523_003_skeleton_sequencer)
 - [20220102_001_tiger_mask](./20220102_001_tiger_mask)
 
 # Deliverables
