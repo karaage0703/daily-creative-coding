@@ -23,6 +23,7 @@ Daily Creative Coding
 - [20220104_002_virtual_theremin](./20220104_002_virtual_theremin)
 - [20220105_001_multi_sound](./20220105_001_multi_sound)
 - [20220105_002_pose_net_sample](./20220105_002_pose_net_sample)
+- [20220523_001_draw_skeleton](./20220523_001_draw_skeleton)
 
 # References
 - https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6
