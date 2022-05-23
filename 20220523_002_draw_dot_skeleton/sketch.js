@@ -21,7 +21,7 @@ let skeleton_size = 100;
 
 let dot_x_numb;
 let dot_y_numb;
-let dot_size = 40;
+let dot_size = 30;
 
 let dots = [];
 
@@ -83,6 +83,7 @@ function draw() {
   drawHead();
   drawBody();
   convertDot();
+  background(255);
   for(let y = 0; y < dot_y_numb; y += 1) {
     for(let x = 0; x < dot_x_numb; x += 1) {
       dots[x + y * dot_x_numb].draw();
