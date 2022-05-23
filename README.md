@@ -24,6 +24,7 @@ Daily Creative Coding
 - [20220105_001_multi_sound](./20220105_001_multi_sound)
 - [20220105_002_pose_net_sample](./20220105_002_pose_net_sample)
 - [20220523_001_draw_skeleton](./20220523_001_draw_skeleton)
+- [20220523_002_draw_dot_skeleton](./20220523_002_draw_dot_skeleton)
 
 # References
-- https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6
+- [scrap memo(zenn)](https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6)
