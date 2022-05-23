@@ -16,8 +16,8 @@ let poses = [];
 let scale_width;
 let scale_height;
 
-let head_size = 500;
-let skeleton_size = 200;
+let head_size = 200;
+let skeleton_size = 50;
 
 
 function setup() {
@@ -40,44 +40,19 @@ function modelReady() {
 }
 
 function draw() {
-  // let img = video.get();
-  // image(img, 0, 0, width, height);
+  let img = video.get();
+  image(img, 0, 0, width, height);
 
   scale_width = width / video.width;
   scale_height = height / video.height;
   scale_mean = (scale_width + scale_height) / 2;
 
   // draw skeleton
-  background(255)
+  // background(255)
   drawSkeleton();
   drawHead();
   drawBody();
 }
-
-// A function to draw ellipses over the detected keypoints
-function drawKeypoints() {
-  // Loop through all the poses detected
-  for (let i = 0; i < poses.length; i++) {
-    // For each pose detected, loop through all the keypoints
-    let pose = poses[i].pose;
-    for (let j = 0; j < pose.keypoints.length; j++) {
-      // A keypoint is an object describing a body part (like rightArm or leftShoulder)
-      let keypoint = pose.keypoints[j];
-      // Only draw an ellipse is the pose probability is bigger than 0.2
-      if (keypoint.score > 0.2) {
-        fill(255, 0, 0);
-        noStroke();
-        ellipse(
-          keypoint.position.x * scale_width,
-          keypoint.position.y * scale_height,
-          20 * scale_mean,
-          20 * scale_mean
-        );
-      }
-    }
-  }
-}
-
 
 // A function to draw the head
 function drawHead() {
