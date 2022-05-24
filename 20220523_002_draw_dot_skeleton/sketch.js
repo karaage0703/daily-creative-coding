@@ -82,13 +82,7 @@ function draw() {
   drawSkeleton();
   drawHead();
   drawBody();
-  convertDot();
-  background(255);
-  for(let y = 0; y < dot_y_numb; y += 1) {
-    for(let x = 0; x < dot_x_numb; x += 1) {
-      dots[x + y * dot_x_numb].draw();
-    }
-  }
+  drawDot();
 }
 
 // A function to draw the head
@@ -164,10 +158,20 @@ function drawSkeleton() {
   }
 }
 
-function convertDot() {
+function drawDot() {
+  // Convert photo to dot picture
   for(let y = 0; y < dot_y_numb; y += 1) {
     for(let x = 0; x < dot_x_numb; x += 1) {
       dots[x + y * dot_x_numb].color = get(x*dot_size + int(dot_size/2), y*dot_size + int(dot_size/2))
+    }
+  }
+
+  background(255);
+
+  // draw dot
+  for(let y = 0; y < dot_y_numb; y += 1) {
+    for(let x = 0; x < dot_x_numb; x += 1) {
+      dots[x + y * dot_x_numb].draw();
     }
   }
 }
