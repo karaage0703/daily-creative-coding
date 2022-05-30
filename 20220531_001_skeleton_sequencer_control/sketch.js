@@ -24,7 +24,10 @@ let dot_y_numb;
 let dot_size = 30;
 
 let dots = [];
-let osc = [];
+let osc_sine = [];
+let osc_triangle = [];
+let osc_square = [];
+let osc_sawtooth = [];
 let osc_freq;
 
 let count = 0;
@@ -38,6 +41,7 @@ let skeleton_color_b = 0;
 
 const PARAMS = {
   speed: 500,
+  sound: 'sine',
 };
 
 class Dot {
@@ -75,7 +79,10 @@ function setup() {
   }
 
   for(let y = 0; y < dot_y_numb; y += 1) {
-    osc[y] = new p5.Oscillator('sine');
+    osc_sine[y] = new p5.Oscillator('sine');
+    osc_sawtooth[y] = new p5.Oscillator('sawtooth');
+    osc_triangle[y] = new p5.Oscillator('triangle');
+    osc_square[y] = new p5.Oscillator('square');
   }
 
   // Create a new poseNet method with a single detection
@@ -93,7 +100,12 @@ function setup() {
   pane.addInput(
     PARAMS, 'speed',
     {min:0, max: 1000, step: 10}
-    );
+  );
+
+  pane.addInput(
+    PARAMS, 'sound',
+    {options: {sine: 'sine', triangle: 'triangle', sawtooth: 'sawtooth', square: 'square'}}
+  );
 
   start_time = millis();
 }
@@ -201,7 +213,10 @@ function playMusic() {
     start_time = millis();
 
     for (let y = 0; y < dot_y_numb; y += 1) {
-      osc[y].stop();
+      osc_sine[y].stop();
+      osc_square[y].stop();
+      osc_sawtooth[y].stop();
+      osc_triangle[y].stop();
     }
 
     // Play tone
@@ -233,8 +248,26 @@ function playMusic() {
         }
 
         let osc_k = int(y/5+1);
-        osc[y].freq(osc_freq * 2 / osc_k);
-        osc[y].start();
+
+        if (PARAMS.sound == 'sine') {
+          osc_sine[y].freq(osc_freq * 2 / osc_k);
+          osc_sine[y].start();
+        }
+
+        if (PARAMS.sound == 'sawtooth') {
+          osc_sawtooth[y].freq(osc_freq * 2 / osc_k);
+          osc_sawtooth[y].start();
+        }
+
+        if (PARAMS.sound == 'triangle') {
+          osc_triangle[y].freq(osc_freq * 2 / osc_k);
+          osc_triangle[y].start();
+        }
+
+        if (PARAMS.sound == 'square') {
+          osc_square[y].freq(osc_freq * 2 / osc_k);
+          osc_square[y].start();
+        }
       }
     }
   }
