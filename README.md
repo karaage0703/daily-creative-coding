@@ -28,6 +28,7 @@ Daily Creative Coding
 - [20220523_002_draw_dot_skeleton](./20220523_002_draw_dot_skeleton)
 - [20220523_003_skeleton_sequencer](./20220523_003_skeleton_sequencer)
 - [20220531_001_skeleton_sequencer_control](./20220531_001_skeleton_sequencer_control)
+- [20220819_001_fireworks](./20220819_001_fireworks)
 
 # References
 - [scrap memo(zenn)](https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6)
