@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeamLab-inspired Interactive Particle Art</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #000;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particles = [];
+    const particleCount = 2000;
+    let mouseX = null;
+    let mouseY = null;
+    let isMouseDown = false;
+
+    class Particle {
+      constructor(x, y, radius, color) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+        this.initialX = x;
+        this.initialY = y;
+        this.velocity = {
+          x: (Math.random() - 0.5) * 2,
+          y: (Math.random() - 0.5) * 2
+        };
+        this.alpha = 1;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.alpha})`;
+        ctx.fill();
+        ctx.closePath();
+      }
+
+      update() {
+        this.draw();
+
+        if (mouseX && mouseY && isMouseDown) {
+          const dx = mouseX - this.x;
+          const dy = mouseY - this.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const maxDistance = 100;
+
+          if (distance < maxDistance) {
+            const force = (maxDistance - distance) / maxDistance;
+            const angle = Math.atan2(dy, dx);
+            const targetX = mouseX - Math.cos(angle) * maxDistance;
+            const targetY = mouseY - Math.sin(angle) * maxDistance;
+            const ax = (targetX - this.x) * force;
+            const ay = (targetY - this.y) * force;
+            this.velocity.x += ax;
+            this.velocity.y += ay;
+            this.alpha = 1;
+          }
+        } else {
+          const dx = this.initialX - this.x;
+          const dy = this.initialY - this.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const maxDistance = 2000;
+
+          if (distance > maxDistance) {
+            this.alpha -= 0.01;
+            if (this.alpha < 0) {
+              this.alpha = 0;
+            }
+          } else {
+            this.alpha -= 0.005;
+            if (this.alpha < 0) {
+              this.alpha = 0;
+            }
+            const force = (maxDistance - distance) / maxDistance;
+            const angle = Math.atan2(dy, dx);
+            const targetX = this.initialX;
+            const targetY = this.initialY;
+            const ax = (targetX - this.x) * force * 0.05;
+            const ay = (targetY - this.y) * force * 0.05;
+            this.velocity.x += ax;
+            this.velocity.y += ay;
+          }
+        }
+
+        this.velocity.x *= 0.95;
+        this.velocity.y *= 0.95;
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+      }
+    }
+
+    function init() {
+      for (let i = 0; i < particleCount; i++) {
+        const radius = Math.random() * 3 + 1;
+        const x = Math.random() * (canvas.width - radius * 2) + radius;
+        const y = Math.random() * (canvas.height - radius * 2) + radius;
+        const color = {
+          r: Math.floor(Math.random() * 256),
+          g: Math.floor(Math.random() * 256),
+          b: Math.floor(Math.random() * 256)
+        };
+
+        particles.push(new Particle(x, y, radius, color));
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(particle => {
+        particle.update();
+      });
+
+      particles = particles.filter(particle => particle.alpha > 0);
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    canvas.addEventListener('mousedown', () => {
+      isMouseDown = true;
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      isMouseDown = false;
+    });
+
+    canvas.addEventListener('mouseout', () => {
+      mouseX = null;
+      mouseY = null;
+      isMouseDown = false;
+    });
+
+    init();
+    animate();
+  </script>
+</body>
+</html>
