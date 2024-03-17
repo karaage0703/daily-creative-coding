@@ -32,6 +32,7 @@ Daily Creative Coding
 - [20230106_001_pixijs](./20230106_001_pixijs)
 - [20231210_001_gpt](./20231210_001_gpt)
 - [20231210_002_gpt](./20231210_002_gpt)
+- [20240317_001_claude3_opus](./20240317_001_claude3_opus)
 
 # References
 - [scrap memo(zenn)](https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6)
