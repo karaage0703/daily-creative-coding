@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遺伝的アルゴリズム シンセサイザー</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const organisms = [];
+        let audioCtx;
+
+        class Organism {
+            constructor(x, y, genes) {
+                this.x = x;
+                this.y = y;
+                this.genes = genes || this.generateGenes();
+                this.lifespan = Math.random() * 100000 + 10000; // 5-15秒
+                this.born = Date.now();
+                this.speed = this.genes[0] * 2 + 0.5;
+                this.moveAmount = this.genes[1] * 10;
+                this.color = `rgb(${this.genes[2] * 255}, ${this.genes[3] * 255}, ${this.genes[4] * 255})`;
+                this.frequency = 200 + this.genes[5] * 800; // 200-1000 Hz
+                this.lastReproduction = Date.now();
+            }
+
+            generateGenes() {
+                return Array(6).fill().map(() => Math.random());
+            }
+
+            move() {
+                const angle = Math.random() * Math.PI * 2;
+                this.x += Math.cos(angle) * this.speed;
+                this.y += Math.sin(angle) * this.speed;
+                this.x = Math.max(0, Math.min(canvas.width, this.x));
+                this.y = Math.max(0, Math.min(canvas.height, this.y));
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            isDead(neighborCount) {
+                return Date.now() - this.born > this.lifespan || neighborCount > 5; // 5以上の近隣生物がいる場合も死滅
+            }
+
+            playSound() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(this.frequency, audioCtx.currentTime);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.1);
+            }
+        }
+
+        function createOffspring(parent1, parent2) {
+            const childGenes = parent1.genes.map((gene, i) => 
+                Math.random() < 0.5 ? gene : parent2.genes[i]
+            );
+            // Mutation
+            if (Math.random() < 0.1) {
+                const mutationIndex = Math.floor(Math.random() * childGenes.length);
+                childGenes[mutationIndex] = Math.random();
+            }
+            return new Organism((parent1.x + parent2.x) / 2, (parent1.y + parent2.y) / 2, childGenes);
+        }
+
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const neighborCounts = new Array(organisms.length).fill(0);
+
+            for (let i = organisms.length - 1; i >= 0; i--) {
+                const org = organisms[i];
+                org.move();
+                org.draw();
+
+                // Check for collisions and count neighbors
+                for (let j = organisms.length - 1; j >= 0; j--) {
+                    if (i === j) continue;
+                    const other = organisms[j];
+                    const dx = org.x - other.x;
+                    const dy = org.y - other.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 20) { // Increased neighbor detection range
+                        neighborCounts[i]++;
+                        neighborCounts[j]++;
+                        if (distance < 10) {
+                            const now = Date.now();
+                            if (now - org.lastReproduction > 4000 && now - other.lastReproduction > 2000) {
+                                org.playSound();
+                                other.playSound();
+                                const child = createOffspring(org, other);
+                                organisms.push(child);
+                                org.lastReproduction = now;
+                                other.lastReproduction = now;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Remove dead organisms
+            for (let i = organisms.length - 1; i >= 0; i--) {
+                if (organisms[i].isDead(neighborCounts[i])) {
+                    organisms.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            organisms.push(new Organism(x, y));
+        });
+
+        update();
+    </script>
+</body>
+</html>
