@@ -8,6 +8,7 @@ Daily Creative Coding
 # Pinned
 - [20220531_001_skeleton_sequencer_control](./20220531_001_skeleton_sequencer_control)
 - [20220102_001_tiger_mask](./20220102_001_tiger_mask)
+- [20240630_001_ga_music](./20240630_001_ga_music)
 
 # Deliverables
 - [20211126_001_first](./20211126_001_first)
@@ -34,6 +35,7 @@ Daily Creative Coding
 - [20231210_002_gpt](./20231210_002_gpt)
 - [20240317_001_claude3_opus](./20240317_001_claude3_opus)
 - [20240630_001_ga_music](./20240630_001_ga_music)
+- [20240707_001_midi_control](./20240707_001_midi_control)
 
 # References
 - [scrap memo(zenn)](https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6)
