@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-TOUCH MINI Psychedelic Controller</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: black; }
+        canvas { display: block; }
+        #audioControl { position: fixed; bottom: 10px; left: 10px; color: white; }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div id="audioControl">
+        <button id="playButton">Play Audio</button>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.5">
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.26/Tone.js"></script>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let shapes = [];
+        let bgColor = [0, 0, 0];
+        let rotationSpeed = 0.01;
+        let particleCount = 100;
+
+        class Shape {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 50 + 10;
+                this.color = [Math.random() * 255, Math.random() * 255, Math.random() * 255];
+                this.speedX = (Math.random() - 0.5) * 4;
+                this.speedY = (Math.random() - 0.5) * 4;
+                this.rotation = 0;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.rotation += rotationSpeed;
+
+                if (this.x > canvas.width + this.size) this.x = -this.size;
+                if (this.x < -this.size) this.x = canvas.width + this.size;
+                if (this.y > canvas.height + this.size) this.y = -this.size;
+                if (this.y < -this.size) this.y = canvas.height + this.size;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.fillStyle = `rgb(${this.color[0]}, ${this.color[1]}, ${this.color[2]})`;
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size / 2);
+                ctx.lineTo(this.size / 2, this.size / 2);
+                ctx.lineTo(-this.size / 2, this.size / 2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function updateParticles() {
+            shapes = [];
+            for (let i = 0; i < particleCount; i++) {
+                shapes.push(new Shape());
+            }
+        }
+
+        updateParticles();
+
+        function animate() {
+            ctx.fillStyle = `rgb(${bgColor[0]}, ${bgColor[1]}, ${bgColor[2]})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            shapes.forEach(shape => {
+                shape.update();
+                shape.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Audio setup
+        const synth = new Tone.PolySynth().toDestination();
+        const notes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
+        let currentNote = 0;
+
+        const playButton = document.getElementById('playButton');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        playButton.addEventListener('click', () => {
+            if (Tone.context.state !== 'running') {
+                Tone.start();
+            }
+            Tone.Transport.start();
+        });
+
+        volumeSlider.addEventListener('input', (e) => {
+            synth.volume.value = Tone.gainToDb(parseFloat(e.target.value));
+        });
+
+        Tone.Transport.scheduleRepeat((time) => {
+            synth.triggerAttackRelease(notes[currentNote], '8n', time);
+            currentNote = (currentNote + 1) % notes.length;
+        }, '4n');
+
+        navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+
+        function onMIDISuccess(midiAccess) {
+            for (let input of midiAccess.inputs.values()) {
+                input.onmidimessage = getMIDIMessage;
+            }
+        }
+
+        function onMIDIFailure() {
+            console.log('MIDIデバイスにアクセスできません');
+        }
+
+        function getMIDIMessage(message) {
+            let command = message.data[0];
+            let number = message.data[1];
+            let value = message.data[2];
+
+            if (command === 176) { // CC messages
+                switch (number) {
+                    case 1: // 1番目のノブ
+                        particleCount = Math.floor(value * 2) + 50;
+                        updateParticles();
+                        break;
+                    case 2: // 2番目のノブ
+                        bgColor[0] = value * 2;
+                        break;
+                    case 3: // 3番目のノブ
+                        bgColor[1] = value * 2;
+                        break;
+                    case 4: // 4番目のノブ
+                        bgColor[2] = value * 2;
+                        break;
+                    case 5: // 5番目のノブ
+                        rotationSpeed = (value - 64) / 640;
+                        break;
+                    case 6: // 6番目のノブ
+                        Tone.Transport.bpm.value = value + 60;
+                        break;
+                    case 7: // 7番目のノブ
+                        synth.set({ "oscillator": { "type": ["sine", "square", "triangle", "sawtooth"][Math.floor(value / 32)] } });
+                        break;
+                    case 8: // 8番目のノブ
+                        synth.set({ "envelope": { "release": value / 32 } });
+                        break;
+                }
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
