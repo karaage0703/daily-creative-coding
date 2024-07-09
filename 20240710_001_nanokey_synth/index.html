@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ヤバいシンセサイザー</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #00ff00;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+        #status {
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        #visualizer {
+            width: 100%;
+            height: 200px;
+            background-color: #000;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>ヤバいシンセサイザー</h1>
+    <div id="status">MIDI接続待機中...</div>
+    <canvas id="visualizer"></canvas>
+
+    <script>
+        const synth = new Tone.PolySynth(Tone.FMSynth).toDestination();
+        const reverb = new Tone.Reverb(5).toDestination();
+        const distortion = new Tone.Distortion(0.8).connect(reverb);
+        synth.connect(distortion);
+
+        const analyser = new Tone.Analyser('waveform', 1024);
+        synth.connect(analyser);
+
+        const statusElement = document.getElementById('status');
+        const canvas = document.getElementById('visualizer');
+        const ctx = canvas.getContext('2d');
+
+        function updateVisualizer() {
+            requestAnimationFrame(updateVisualizer);
+            const waveform = analyser.getValue();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            for (let i = 0; i < waveform.length; i++) {
+                const x = i / waveform.length * canvas.width;
+                const y = (waveform[i] + 1) / 2 * canvas.height;
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.strokeStyle = '#00ff00';
+            ctx.stroke();
+        }
+
+        navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+
+        function onMIDISuccess(midiAccess) {
+            statusElement.textContent = 'MIDI接続成功！演奏を開始してください。';
+            for (const input of midiAccess.inputs.values()) {
+                input.onmidimessage = onMIDIMessage;
+            }
+            updateVisualizer();
+        }
+
+        function onMIDIFailure() {
+            statusElement.textContent = 'MIDI接続失敗。KORG Nano keyが接続されているか確認してください。';
+        }
+
+        function onMIDIMessage(message) {
+            const [status, note, velocity] = message.data;
+            if (status === 144 && velocity > 0) {
+                const freq = Tone.Frequency(note, "midi").toFrequency();
+                synth.triggerAttack(freq);
+            } else if (status === 128 || (status === 144 && velocity === 0)) {
+                const freq = Tone.Frequency(note, "midi").toFrequency();
+                synth.triggerRelease(freq);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X TOUCH MINI ドラムマシン</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f0f0; }
+        #sequencer { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; max-width: 800px; margin: 20px auto; }
+        .step { width: 50px; height: 50px; background-color: #ddd; border: none; border-radius: 5px; }
+        .step.active { background-color: #4CAF50; }
+        #controls { margin: 20px 0; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        #midiInfo { margin-top: 20px; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto; }
+    </style>
+</head>
+<body>
+    <h1>X TOUCH MINI ドラムマシン</h1>
+    <div id="sequencer"></div>
+    <div id="controls">
+        <button id="playPause">再生/停止</button>
+        <button id="clear">クリア</button>
+    </div>
+    <div id="midiInfo">
+        <h2>MIDI情報:</h2>
+        <pre id="midiDebug"></pre>
+    </div>
+
+    <script>
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const sequencer = document.getElementById('sequencer');
+        const playPauseButton = document.getElementById('playPause');
+        const clearButton = document.getElementById('clear');
+        const midiDebug = document.getElementById('midiDebug');
+        let isPlaying = false;
+        let currentStep = 0;
+        let intervalId;
+
+        const steps = Array(4).fill().map(() => Array(8).fill(false));
+        const drumSounds = ['kick', 'snare', 'hihat', 'tom'];
+        let soundParameters = {
+            frequency: 200,
+            modulation: 0
+        };
+
+        function createButton(row, col) {
+            const button = document.createElement('button');
+            button.className = 'step';
+            button.addEventListener('click', () => toggleStep(row, col));
+            return button;
+        }
+
+        function toggleStep(row, col) {
+            steps[row][col] = !steps[row][col];
+            updateSequencerUI();
+        }
+
+        function updateSequencerUI() {
+            sequencer.innerHTML = '';
+            for (let row = 0; row < 4; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const button = createButton(row, col);
+                    if (steps[row][col]) button.classList.add('active');
+                    sequencer.appendChild(button);
+                }
+            }
+        }
+
+        function playStep() {
+            for (let row = 0; row < 4; row++) {
+                if (steps[row][currentStep]) {
+                    playDrumSound(row);
+                }
+            }
+            currentStep = (currentStep + 1) % 8;
+        }
+
+        function playDrumSound(row) {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            const modulator = audioContext.createOscillator();
+            const modulatorGain = audioContext.createGain();
+
+            modulator.connect(modulatorGain);
+            modulatorGain.connect(osc.frequency);
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+
+            const baseFreq = soundParameters.frequency * (row + 1);
+            osc.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
+            modulator.frequency.setValueAtTime(baseFreq * 0.5, audioContext.currentTime);
+            modulatorGain.gain.setValueAtTime(soundParameters.modulation, audioContext.currentTime);
+
+            gain.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+
+            osc.start();
+            modulator.start();
+            osc.stop(audioContext.currentTime + 0.1);
+            modulator.stop(audioContext.currentTime + 0.1);
+        }
+
+        playPauseButton.addEventListener('click', () => {
+            if (isPlaying) {
+                clearInterval(intervalId);
+                playPauseButton.textContent = '再生';
+            } else {
+                intervalId = setInterval(playStep, 125);
+                playPauseButton.textContent = '停止';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        clearButton.addEventListener('click', () => {
+            steps.forEach(row => row.fill(false));
+            updateSequencerUI();
+        });
+
+        function initMIDI() {
+            if (navigator.requestMIDIAccess) {
+                navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+            } else {
+                console.log('WebMIDI is not supported in this browser.');
+                midiDebug.textContent += 'WebMIDI is not supported in this browser.\n';
+            }
+        }
+
+        function onMIDISuccess(midiAccess) {
+            midiDebug.textContent += 'MIDI Access Success\n';
+            for (let input of midiAccess.inputs.values()) {
+                midiDebug.textContent += `Input: ${input.name}\n`;
+                input.onmidimessage = getMIDIMessage;
+            }
+        }
+
+        function onMIDIFailure(error) {
+            console.log('Could not access your MIDI devices.', error);
+            midiDebug.textContent += `MIDI Access Failure: ${error}\n`;
+        }
+
+        function getMIDIMessage(message) {
+            const [command, note, velocity] = message.data;
+            midiDebug.textContent += `MIDI Message: ${command} ${note} ${velocity}\n`;
+
+            if (command === 154) {
+                let row, col;
+                if (note >= 8 && note <= 15) {
+                    row = 0;
+                    col = note - 8;
+                } else if (note >= 16 && note <= 23) {
+                    row = 1;
+                    col = note - 16;
+                } else if (note >= 32 && note <= 39) {
+                    row = 2;
+                    col = note - 32;
+                } else if (note >= 40 && note <= 47) {
+                    row = 3;
+                    col = note - 40;
+                }
+
+                if (row !== undefined && col !== undefined) {
+                    toggleStep(row, col);
+                }
+            } else if (command === 186) {
+                if (note === 1) {
+                    soundParameters.frequency = Math.max(50, Math.min(500, velocity * 4));
+                } else if (note === 2) {
+                    soundParameters.modulation = velocity;
+                }
+            }
+        }
+
+        updateSequencerUI();
+        initMIDI();
+    </script>
+</body>
+</html>

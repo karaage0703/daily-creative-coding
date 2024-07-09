@@ -130,7 +130,7 @@
             let number = message.data[1];
             let value = message.data[2];
 
-            if (command === 176) { // CC messages
+            // if (command === 176) { // CC messages
                 switch (number) {
                     case 1: // 1番目のノブ
                         particleCount = Math.floor(value * 2) + 50;
@@ -158,7 +158,7 @@
                         synth.set({ "envelope": { "release": value / 32 } });
                         break;
                 }
-            }
+            // }
         }
 
         window.addEventListener('resize', () => {
