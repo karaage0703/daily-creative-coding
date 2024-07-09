@@ -36,6 +36,8 @@ Daily Creative Coding
 - [20240317_001_claude3_opus](./20240317_001_claude3_opus)
 - [20240630_001_ga_music](./20240630_001_ga_music)
 - [20240707_001_midi_control](./20240707_001_midi_control)
+- [20240710_001_nanokey_synth](./20240710_001_nanokey_synth)
+- [20240710_002_drum_machine](./20240710_002_drum_machine)
 
 # References
 - [scrap memo(zenn)](https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6)
