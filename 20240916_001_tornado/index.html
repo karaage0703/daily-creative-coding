@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>リアルな竜巻シミュレーション</title>
+    <style>
+        canvas {
+            background-color: #87CEEB; /* 空の色 */
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="600" height="600"></canvas>
+    <script>
+        // キャンバスとコンテキストの取得
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // パーティクル（粒子）の設定
+        const particles = [];
+        const particleCount = 1000; // 粒子の数
+
+        // 竜巻のパラメータ
+        const tornado = {
+            x: canvas.width / 2,
+            y: canvas.height,
+            maxHeight: canvas.height * 0.8,
+            currentHeight: 0,
+            minRadius: 5, // 下部の最小半径
+            maxRadius: 80, // 上部の最大半径
+            rotationSpeed: 0.05,
+            growthSpeed: 1
+        };
+
+        // パーティクルクラスの定義
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.height = Math.random() * tornado.currentHeight;
+                this.angle = Math.random() * Math.PI * 2;
+                this.radius = tornado.minRadius + (this.height / tornado.maxHeight) * (tornado.maxRadius - tornado.minRadius);
+                this.x = tornado.x + this.radius * Math.cos(this.angle);
+                this.y = tornado.y - this.height;
+                this.speed = Math.random() * 0.5 + 0.5;
+                this.color = 'rgba(100, 100, 100, ' + (Math.random() * 0.5 + 0.5) + ')';
+            }
+
+            update() {
+                this.angle += tornado.rotationSpeed;
+                this.height += this.speed;
+                if (this.height > tornado.currentHeight) {
+                    this.reset();
+                }
+                this.radius = tornado.minRadius + (this.height / tornado.maxHeight) * (tornado.maxRadius - tornado.minRadius);
+                this.x = tornado.x + this.radius * Math.cos(this.angle);
+                this.y = tornado.y - this.height;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // パーティクルの初期化
+        function initParticles() {
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        // アニメーションの開始
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 竜巻の高さを増加
+            if (tornado.currentHeight < tornado.maxHeight) {
+                tornado.currentHeight += tornado.growthSpeed;
+            }
+
+            // パーティクルの更新と描画
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+        }
+
+        // パーティクルの初期化とアニメーションの開始
+        initParticles();
+        animate();
+    </script>
+</body>
+</html>

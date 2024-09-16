@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tornado Simulation</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="tornadoCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('tornadoCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particlesArray = [];
+        const numberOfParticles = 300;
+
+        class Particle {
+            constructor(x, y, radius, color) {
+                this.x = x;
+                this.y = y;
+                this.radius = radius;
+                this.color = color;
+                this.speed = Math.random() * 2 + 0.5;
+                this.angle = Math.random() * Math.PI * 2;
+                this.distanceFromCenter = Math.random() * 50 + 100;
+                this.spinSpeed = Math.random() * 0.05 + 0.02;
+            }
+
+            update() {
+                // パーティクルの角度を更新して螺旋を作成
+                this.angle += this.spinSpeed;
+
+                // 竜巻の中心に向かって内側に引き寄せられるように
+                this.distanceFromCenter -= 0.2;
+
+                // パーティクルの位置を更新
+                this.x = canvas.width / 2 + Math.cos(this.angle) * this.distanceFromCenter;
+                this.y = canvas.height - (this.distanceFromCenter * 2);
+
+                // 消えていくパーティクルを再生成
+                if (this.distanceFromCenter <= 0) {
+                    this.distanceFromCenter = Math.random() * 50 + 100;
+                    this.angle = Math.random() * Math.PI * 2;
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < numberOfParticles; i++) {
+                const radius = Math.random() * 3 + 1;
+                const color = 'rgba(255, 255, 255, 0.5)';
+                particlesArray.push(new Particle(canvas.width / 2, canvas.height, radius, color));
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            particlesArray.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        init();
+        animate();
+    </script>
+</body>
+</html>
