@@ -40,6 +40,7 @@ Daily Creative Coding
 - [20240710_002_drum_machine](./20240710_002_drum_machine)
 - [20240916_001_tornado](./20240916_001_tornado)
 - [20240916_002_tornado](./20240916_002_tornado)
+- [20250811_001_fireworks](./20250811_001_fireworks)
 
 # References
 - [scrap memo(zenn)](https://zenn.dev/karaage0703/scraps/f4e9c0174d76e6)
